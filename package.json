@@ -5,7 +5,7 @@
   "description": "Small description for fastboot-error-intercepting goes here",
   "repository": "",
   "license": "MIT",
-  "author": "",
+  "author": "Riley Hilliard",
   "directories": {
     "doc": "doc",
     "test": "tests"
