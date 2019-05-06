@@ -2,7 +2,7 @@
 
 module.exports = function(environment) {
   let ENV = {
-    modulePrefix: 'github-fastboot-example',
+    modulePrefix: 'fastboot-error-intercepting',
     environment,
     rootURL: '/',
     locationType: 'auto',
@@ -29,6 +29,10 @@ module.exports = function(environment) {
     // ENV.APP.LOG_TRANSITIONS = true;
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
+
+    ENV.fastboot = {
+      hostWhitelist: [/^localhost:\d+$/]
+    }
   }
 
   if (environment === 'test') {

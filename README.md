@@ -1,57 +1,18 @@
-# github-fastboot-example
+# fastboot-error-intercepting
+`yarn start`
 
-This README outlines the details of collaborating on this Ember application.
-A short introduction of this app could easily go here.
+This repo demonstrates various behaviors when errors are thrown in fastboot.
 
-## Prerequisites
+Throwing an error synchronously is caught in the `ember-cli-fastboot` Ember.onerror and is not rethrown. Forcing this to re-throw will allow the error to propagate all the way to the top of the node process, but still does not crash the node server. To do this, `ember-cli-fastboot` needs to be edited to remove the Ember.onerror assignment.
 
-You will need the following things properly installed on your computer.
+If Ember.onerror does not rethrow, the error ceases to propagate, even to process.on(‘uncaughtException’). This means all _synchronous_ errors are silenced via the Ember.onerror that does not re-throw within `ember-cli-fastboot`, however reassigning Ember.onerror will override the setting in `ember-cli-fastboot`.
 
-* [Git](https://git-scm.com/)
-* [Node.js](https://nodejs.org/) (with npm)
-* [Ember CLI](https://ember-cli.com/)
-* [Google Chrome](https://google.com/chrome/)
-
-## Installation
-
-* `git clone <repository-url>` this repository
-* `cd github-fastboot-example`
-* `npm install`
-
-## Running / Development
-
-* `ember serve`
-* Visit your app at [http://localhost:4200](http://localhost:4200).
-* Visit your tests at [http://localhost:4200/tests](http://localhost:4200/tests).
-
-### Code Generators
-
-Make use of the many generators for code, try `ember help generate` for more details
-
-### Running Tests
-
-* `ember test`
-* `ember test --server`
-
-### Linting
-
-* `npm run lint:hbs`
-* `npm run lint:js`
-* `npm run lint:js -- --fix`
-
-### Building
-
-* `ember build` (development)
-* `ember build --environment production` (production)
-
-### Deploying
-
-Specify what it takes to deploy your app.
-
-## Further Reading / Useful Links
-
-* [ember.js](https://emberjs.com/)
-* [ember-cli](https://ember-cli.com/)
-* Development Browser Extensions
-  * [ember inspector for chrome](https://chrome.google.com/webstore/detail/ember-inspector/bmdblncegkenkacieihfhpjfppoconhi)
-  * [ember inspector for firefox](https://addons.mozilla.org/en-US/firefox/addon/ember-inspector/)
+If the error is re-thrown in a `process.on(‘uncaughtException’)`, the node process will crash. To enforce this, the error must be thrown in the function callback, and cannot defer to a wrapped promise rejection. In order for the `process` code in this example to work, `ember-cli-fastboot` needs to be yarn linkeded and edited to pass in `process` into `index.js` @:
+```javascript
+this.fastboot = new FastBoot({
+  distPath: outputPath,
+  sandboxGlobals: {
+    process //  add this
+  }
+});
+```
